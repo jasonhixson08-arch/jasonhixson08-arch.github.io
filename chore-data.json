@@ -55,8 +55,10 @@
       "id": "4",
       "name": "Living Room",
       "pay": 2,
-      "status": "available",
-      "weight": "medium"
+      "status": "in-progress",
+      "weight": "medium",
+      "assignedTo": "1",
+      "startTime": "12:32 PM"
     },
     {
       "id": "5",
@@ -8564,6 +8566,11 @@
   ],
   "loginLogs": [
     {
+      "timestamp": "12/23/2025, 12:32:32 PM",
+      "user": "Joshua",
+      "action": "Started chore: Living Room"
+    },
+    {
       "timestamp": "12/23/2025, 3:06:40 AM",
       "user": "Admin",
       "action": "Approved loan of $2.50 for Mom"
@@ -8754,5 +8761,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2025-12-23T18:32:15.820Z"
+  "lastUpdated": "2025-12-23T18:32:33.703Z"
 }
