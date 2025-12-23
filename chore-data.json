@@ -12,21 +12,21 @@
       "name": "Jayden",
       "balance": 3,
       "code": "9999",
-      "exempt": true
+      "exempt": false
     },
     {
       "id": "3",
       "name": "Daysha",
       "balance": 0,
       "code": "8585",
-      "exempt": true
+      "exempt": false
     },
     {
       "id": "4",
       "name": "Jason",
       "balance": 0,
       "code": "9485",
-      "exempt": true
+      "exempt": false
     },
     {
       "id": "5",
@@ -8581,6 +8581,21 @@
   ],
   "loginLogs": [
     {
+      "timestamp": "12/23/2025, 1:07:40 PM",
+      "user": "Admin",
+      "action": "Removed exemption for Jayden"
+    },
+    {
+      "timestamp": "12/23/2025, 1:07:39 PM",
+      "user": "Admin",
+      "action": "Removed exemption for Daysha"
+    },
+    {
+      "timestamp": "12/23/2025, 1:07:39 PM",
+      "user": "Admin",
+      "action": "Removed exemption for Jason"
+    },
+    {
       "timestamp": "12/23/2025, 1:07:35 PM",
       "user": "Admin",
       "action": "Generated yearly schedule with all chores assigned daily"
@@ -8871,5 +8886,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2025-12-23T19:07:37.812Z"
+  "lastUpdated": "2025-12-23T19:07:41.829Z"
 }
