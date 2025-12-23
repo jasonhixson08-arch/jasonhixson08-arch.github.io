@@ -36,7 +36,9 @@
       "id": "1",
       "name": "Dishes",
       "pay": 3,
-      "status": "available"
+      "status": "in-progress",
+      "assignedTo": "1",
+      "startTime": "12:08 AM"
     },
     {
       "id": "2",
@@ -67,6 +69,12 @@
   "weeklySchedule": {},
   "storedAdminPin": "Hixson",
   "loanRequests": [],
-  "loginLogs": [],
-  "lastUpdated": "2025-12-23T06:08:41.767Z"
+  "loginLogs": [
+    {
+      "timestamp": "12/23/2025, 12:08:58 AM",
+      "user": "Joshua",
+      "action": "Started chore: Dishes"
+    }
+  ],
+  "lastUpdated": "2025-12-23T06:08:59.661Z"
 }
