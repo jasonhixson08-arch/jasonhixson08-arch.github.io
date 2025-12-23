@@ -8535,6 +8535,14 @@
   "storedAdminPin": "Hixson",
   "loanRequests": [
     {
+      "id": "1766480790938",
+      "userId": "5",
+      "userName": "Mom",
+      "amount": 2.5,
+      "status": "pending",
+      "requestedAt": "12/23/2025, 3:06:30 AM"
+    },
+    {
       "id": "1766480358906",
       "userId": "1",
       "userName": "Joshua",
@@ -8554,6 +8562,11 @@
     }
   ],
   "loginLogs": [
+    {
+      "timestamp": "12/23/2025, 3:06:30 AM",
+      "user": "Mom",
+      "action": "Requested loan of $2.50"
+    },
     {
       "timestamp": "12/23/2025, 3:05:52 AM",
       "user": "Joshua",
@@ -8730,5 +8743,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2025-12-23T09:05:53.448Z"
+  "lastUpdated": "2025-12-23T09:06:33.258Z"
 }
