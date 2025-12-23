@@ -99,14 +99,79 @@
     }
   ],
   "weeklySchedule": {
-    "Saturday": {
+    "Monday": {
+      "2": [
+        "Trash",
+        "Dishes"
+      ],
+      "3": [
+        "Living Room"
+      ],
+      "4": [
+        "Counters",
+        "Floors"
+      ]
+    },
+    "Tuesday": {
+      "1": [
+        "Trash",
+        "Dishes"
+      ],
+      "2": [
+        "Living Room"
+      ],
+      "4": [
+        "Counters",
+        "Floors"
+      ]
+    },
+    "Wednesday": {
+      "1": [
+        "Counters",
+        "Floors"
+      ],
+      "2": [
+        "Living Room"
+      ],
+      "4": [
+        "Trash",
+        "Dishes"
+      ]
+    },
+    "Thursday": {
+      "1": [
+        "Trash",
+        "Dishes"
+      ],
+      "4": [
+        "Counters",
+        "Floors"
+      ],
+      "5": [
+        "Living Room"
+      ]
+    },
+    "Friday": {
       "2": [
         "Counters",
         "Floors"
       ],
-      "3": [
+      "4": [
+        "Living Room"
+      ],
+      "5": [
         "Trash",
         "Dishes"
+      ]
+    },
+    "Saturday": {
+      "1": [
+        "Trash",
+        "Dishes"
+      ],
+      "4": [
+        "Counters",
+        "Floors"
       ],
       "5": [
         "Living Room"
@@ -114,78 +179,13 @@
     },
     "Sunday": {
       "1": [
-        "Trash",
-        "Dishes"
-      ],
-      "4": [
         "Living Room"
       ],
-      "5": [
-        "Counters",
-        "Floors"
-      ]
-    },
-    "Monday": {
       "2": [
         "Counters",
         "Floors"
       ],
-      "3": [
-        "Trash",
-        "Dishes"
-      ],
       "4": [
-        "Living Room"
-      ]
-    },
-    "Tuesday": {
-      "1": [
-        "Counters",
-        "Floors"
-      ],
-      "2": [
-        "Trash",
-        "Dishes"
-      ],
-      "3": [
-        "Living Room"
-      ]
-    },
-    "Wednesday": {
-      "2": [
-        "Trash",
-        "Dishes"
-      ],
-      "3": [
-        "Counters",
-        "Floors"
-      ],
-      "4": [
-        "Living Room"
-      ]
-    },
-    "Thursday": {
-      "1": [
-        "Counters",
-        "Floors"
-      ],
-      "3": [
-        "Living Room"
-      ],
-      "4": [
-        "Trash",
-        "Dishes"
-      ]
-    },
-    "Friday": {
-      "1": [
-        "Counters",
-        "Floors"
-      ],
-      "4": [
-        "Living Room"
-      ],
-      "5": [
         "Trash",
         "Dishes"
       ]
@@ -194,6 +194,11 @@
   "storedAdminPin": "Hixson",
   "loanRequests": [],
   "loginLogs": [
+    {
+      "timestamp": "12/23/2025, 1:57:03 AM",
+      "user": "Admin",
+      "action": "Generated weekly schedule"
+    },
     {
       "timestamp": "12/23/2025, 1:57:00 AM",
       "user": "Admin",
@@ -260,5 +265,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2025-12-23T07:57:01.793Z"
+  "lastUpdated": "2025-12-23T07:57:05.408Z"
 }
