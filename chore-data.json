@@ -5,7 +5,7 @@
       "name": "Joshua",
       "balance": 14.5,
       "code": "9090",
-      "exempt": true
+      "exempt": false
     },
     {
       "id": "2",
@@ -13691,6 +13691,21 @@
   ],
   "loginLogs": [
     {
+      "timestamp": "12/23/2025, 4:42:03 PM",
+      "user": "Admin",
+      "action": "Removed exemption for Joshua"
+    },
+    {
+      "timestamp": "12/23/2025, 4:42:03 PM",
+      "user": "Admin",
+      "action": "Added exemption for Joshua"
+    },
+    {
+      "timestamp": "12/23/2025, 4:42:02 PM",
+      "user": "Admin",
+      "action": "Removed exemption for Joshua"
+    },
+    {
       "timestamp": "12/23/2025, 4:42:01 PM",
       "user": "Admin",
       "action": "Added exemption for Joshua"
@@ -14076,5 +14091,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2025-12-23T22:42:02.324Z"
+  "lastUpdated": "2025-12-23T22:42:04.717Z"
 }
