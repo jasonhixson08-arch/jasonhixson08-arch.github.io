@@ -8581,6 +8581,11 @@
   ],
   "loginLogs": [
     {
+      "timestamp": "12/23/2025, 1:10:28 PM",
+      "user": "Admin",
+      "action": "Logged in"
+    },
+    {
       "timestamp": "12/23/2025, 1:07:42 PM",
       "user": "Admin",
       "action": "Removed exemption for Joshua"
@@ -8891,5 +8896,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2025-12-23T19:10:19.873Z"
+  "lastUpdated": "2025-12-23T19:10:29.916Z"
 }
