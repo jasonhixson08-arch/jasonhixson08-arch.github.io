@@ -254,7 +254,8 @@
           // Auto-load token from Pastebin
           const loadTokenFromPastebin = async () => {
             try {
-              const pastebinUrl = 'https://pastebin.com/raw/Fb16R9Du';
+              // Using CORS proxy to fetch from Pastebin
+              const pastebinUrl = 'https://corsproxy.io/?https://pastebin.com/raw/Fb16R9Du';
               const response = await fetch(pastebinUrl);
               if (!response.ok) throw new Error('Failed to fetch');
               const fetchedToken = await response.text();
