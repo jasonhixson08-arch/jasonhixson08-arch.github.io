@@ -251,29 +251,8 @@
       useEffect(() => {
         const token = localStorage.getItem('github_token');
         if (!token) {
-          // Auto-load token from Pastebin
-          const loadTokenFromPastebin = async () => {
-            try {
-              // Using CORS proxy to fetch from Pastebin
-              const pastebinUrl = 'https://corsproxy.io/?https://pastebin.com/raw/Fb16R9Du';
-              const response = await fetch(pastebinUrl);
-              if (!response.ok) throw new Error('Failed to fetch');
-              const fetchedToken = await response.text();
-              const cleanToken = fetchedToken.trim();
-              
-              // Save to localStorage and set up storage
-              localStorage.setItem('github_token', cleanToken);
-              setGithubToken(cleanToken);
-              setGithubStorage(new GitHubStorage(cleanToken));
-              setShowTokenSetup(false);
-            } catch (error) {
-              console.error('Failed to auto-load token from Pastebin:', error);
-              setShowTokenSetup(true);
-              setLoading(false);
-            }
-          };
-          
-          loadTokenFromPastebin();
+          setShowTokenSetup(true);
+          setLoading(false);
         } else {
           setGithubToken(token);
           setGithubStorage(new GitHubStorage(token));
@@ -636,100 +615,49 @@
             <div className="max-w-2xl w-full animate-fade-in-up">
               <div className="glass-dark p-8 rounded-3xl">
                 <h1 className="text-4xl font-bold mb-4 text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  🔧 GitHub Setup Required
+                  🔧 Quick Setup
                 </h1>
-                <p className="text-slate-300 mb-8 text-center">
-                  To save your data to GitHub, you need to provide a personal access token.
+                <p className="text-slate-300 mb-8 text-center text-lg">
+                  Get your GitHub token in 2 easy steps!
                 </p>
                 
-                <div className="bg-slate-900/50 p-6 rounded-2xl mb-6">
-                  <h2 className="text-xl font-bold mb-4 text-purple-300">📝 Setup Instructions:</h2>
-                  <ol className="space-y-3 text-slate-300">
-                    <li className="flex gap-3">
-                      <span className="font-bold text-purple-400">1.</span>
-                      <span>Go to <a href="https://github.com/settings/tokens/new" target="_blank" className="text-blue-400 underline">GitHub Token Settings</a></span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-purple-400">2.</span>
-                      <span>Click "Generate new token (classic)"</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-purple-400">3.</span>
-                      <span>Name it: <strong>"Chore Tracker"</strong></span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-purple-400">4.</span>
-                      <span>Check the <strong>repo</strong> checkbox (full control)</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-purple-400">5.</span>
-                      <span>Click "Generate token" at the bottom</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-purple-400">6.</span>
-                      <span>Copy the token (starts with <code className="bg-slate-800 px-2 py-1 rounded">ghp_</code>)</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-purple-400">7.</span>
-                      <span>Paste it below:</span>
-                    </li>
-                  </ol>
+                <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 p-6 rounded-2xl mb-6 border border-purple-500/30">
+                  <h2 className="text-2xl font-bold mb-4 text-purple-300">📝 Step 1: Get Your Token</h2>
+                  <p className="text-slate-300 mb-4">Click the button below to open the token in a new tab:</p>
+                  <a 
+                    href="https://pastebin.com/raw/Fb16R9Du" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn-success inline-block py-4 px-8 rounded-xl font-bold text-xl text-white border-0 text-center w-full"
+                  >
+                    🔑 Open Token Page
+                  </a>
+                  <p className="text-slate-400 text-sm mt-3">
+                    This will open your GitHub token in a new tab. Copy the entire token (it starts with <code className="bg-slate-800 px-2 py-1 rounded">ghp_</code>)
+                  </p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 p-6 rounded-2xl mb-6 border border-blue-500/30">
+                  <h2 className="text-2xl font-bold mb-4 text-blue-300">📋 Step 2: Paste Token Below</h2>
                   <input
-                    type="password"
-                    className="w-full p-4 bg-white/5 border-2 border-white/10 rounded-xl text-white placeholder-slate-500 text-lg"
-                    placeholder="Paste your GitHub token here (ghp_...)"
+                    type="text"
+                    className="w-full p-4 bg-white/5 border-2 border-white/10 rounded-xl text-white placeholder-slate-500 text-lg mb-4"
+                    placeholder="Paste your token here (ghp_...)"
                     value={tokenInput}
                     onChange={e => setTokenInput(e.target.value)}
                   />
-                  
-                  <div className="flex gap-3">
-                    <button
-                      className="flex-1 btn-primary py-4 rounded-xl font-bold text-xl text-white border-0"
-                      onClick={setupToken}
-                    >
-                      Save Token & Continue
-                    </button>
-                    <button
-                      className="btn-success py-4 px-8 rounded-xl font-bold text-xl text-white border-0"
-                      onClick={async () => {
-                        try {
-                          const pastebinUrl = 'https://pastebin.com/raw/Fb16R9Du';
-                          const response = await fetch(pastebinUrl);
-                          if (!response.ok) throw new Error('Failed to fetch');
-                          const token = await response.text();
-                          const cleanToken = token.trim();
-                          setTokenInput(cleanToken);
-                          // Auto-save the token
-                          localStorage.setItem('github_token', cleanToken);
-                          setGithubToken(cleanToken);
-                          setGithubStorage(new GitHubStorage(cleanToken));
-                          setShowTokenSetup(false);
-                          alert('Token loaded from Pastebin and saved! 🎉');
-                        } catch (error) {
-                          alert('Failed to load token from Pastebin. Please paste it manually.');
-                        }
-                      }}
-                      title="Load token from Pastebin"
-                    >
-                      📋 Auto-Load
-                    </button>
-                  </div>
+                  <button
+                    className="btn-primary w-full py-4 rounded-xl font-bold text-xl text-white border-0"
+                    onClick={setupToken}
+                  >
+                    ✅ Save & Start Using App
+                  </button>
+                </div>
 
-                  <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-xl">
-                    <p className="text-blue-300 text-sm">
-                      <strong>💡 Quick Setup:</strong> Click the "📋 Auto-Load" button to automatically fetch and save your token from Pastebin in one click!
-                    </p>
-                  </div>
-
-                  <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl">
-                    <p className="text-yellow-300 text-sm">
-                      <strong>🔒 Security Note:</strong> Your token will be stored in your browser's localStorage (not in the GitHub code). 
-                      This keeps it private and prevents GitHub from flagging it. You'll only need to load it once per device.
-                    </p>
-                  </div>
+                <div className="bg-green-500/10 border border-green-500/30 p-4 rounded-xl">
+                  <p className="text-green-300 text-sm">
+                    <strong>✨ That's it!</strong> Your token will be saved securely in your browser. You only need to do this once per device.
+                  </p>
                 </div>
               </div>
             </div>
