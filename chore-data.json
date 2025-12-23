@@ -3,7 +3,7 @@
     {
       "id": "1",
       "name": "Joshua",
-      "balance": 12.5,
+      "balance": 14.5,
       "code": "9090"
     },
     {
@@ -55,10 +55,8 @@
       "id": "4",
       "name": "Living Room",
       "pay": 2,
-      "status": "in-progress",
-      "weight": "medium",
-      "assignedTo": "1",
-      "startTime": "12:32 PM"
+      "status": "available",
+      "weight": "medium"
     },
     {
       "id": "5",
@@ -69,6 +67,18 @@
     }
   ],
   "completedChores": [
+    {
+      "id": "4",
+      "name": "Living Room",
+      "pay": 2,
+      "status": "completed",
+      "weight": "medium",
+      "assignedTo": "1",
+      "startTime": "12:32 PM",
+      "completedAt": "12/23/2025, 12:32:34 PM",
+      "userName": "Joshua",
+      "finishTime": "12:32 PM"
+    },
     {
       "id": "3",
       "name": "Counters",
@@ -8566,6 +8576,11 @@
   ],
   "loginLogs": [
     {
+      "timestamp": "12/23/2025, 12:32:34 PM",
+      "user": "Joshua",
+      "action": "Completed chore: Living Room (+$2)"
+    },
+    {
       "timestamp": "12/23/2025, 12:32:32 PM",
       "user": "Joshua",
       "action": "Started chore: Living Room"
@@ -8761,5 +8776,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2025-12-23T18:32:33.703Z"
+  "lastUpdated": "2025-12-23T18:32:35.398Z"
 }
