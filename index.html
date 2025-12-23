@@ -108,8 +108,6 @@
       dataFile: 'chore-data.json'
     };
 
-    const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
     const defaultUsers = [
       { id: "1", name: "Joshua", balance: 0, code: "9900" },
       { id: "2", name: "Jayden", balance: 0, code: "9999" },
@@ -119,43 +117,47 @@
     ];
 
     const defaultChores = [
-      { id: "1", name: "Dishes", pay: 3, status: "available" },
-      { id: "2", name: "Trash", pay: 0.50, status: "available" },
-      { id: "3", name: "Counters", pay: 0.50, status: "available" },
-      { id: "4", name: "Living Room", pay: 2, status: "available" },
-      { id: "5", name: "Floors", pay: 3, status: "available" }
+      { id: "1", name: "Dishes", pay: 3, status: "available", weight: "heavy" },
+      { id: "2", name: "Trash", pay: 0.50, status: "available", weight: "light" },
+      { id: "3", name: "Counters", pay: 0.50, status: "available", weight: "light" },
+      { id: "4", name: "Living Room", pay: 2, status: "available", weight: "medium" },
+      { id: "5", name: "Floors", pay: 3, status: "available", weight: "heavy" }
     ];
 
-    // Get the last Monday of December
-    const getLastMondayOfDecember = () => {
-      const year = new Date().getFullYear();
-      const dec31 = new Date(year, 11, 31); // December 31
-      const dayOfWeek = dec31.getDay();
-      const daysToSubtract = (dayOfWeek + 6) % 7; // Days back to last Monday
-      const lastMonday = new Date(year, 11, 31 - daysToSubtract);
-      return lastMonday;
+    const getMonthData = (year, month) => {
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay();
+      
+      return { daysInMonth, startingDayOfWeek };
     };
 
-    // Generate dates for the next 30 days starting from last Monday of December
-    const generateDatesFromLastMonday = () => {
-      const startDate = getLastMondayOfDecember();
-      const dates = [];
-      for (let i = 0; i < 30; i++) {
-        const date = new Date(startDate);
-        date.setDate(startDate.getDate() + i);
-        dates.push(date);
+    const getWeeksInMonth = (year, month) => {
+      const { daysInMonth, startingDayOfWeek } = getMonthData(year, month);
+      const weeks = [];
+      let currentWeek = [];
+      
+      for (let i = 0; i < startingDayOfWeek; i++) {
+        currentWeek.push(null);
       }
-      return dates;
-    };
-
-    const formatDate = (date) => {
-      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return {
-        dayName: days[date.getDay()],
-        monthDay: `${months[date.getMonth()]} ${date.getDate()}`,
-        fullDate: date.toISOString().split('T')[0]
-      };
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        currentWeek.push(day);
+        if (currentWeek.length === 7) {
+          weeks.push(currentWeek);
+          currentWeek = [];
+        }
+      }
+      
+      if (currentWeek.length > 0) {
+        while (currentWeek.length < 7) {
+          currentWeek.push(null);
+        }
+        weeks.push(currentWeek);
+      }
+      
+      return weeks;
     };
 
     // GitHub API Helper
@@ -253,6 +255,9 @@
       const [chores, setChores] = useState(defaultChores);
       const [completedChores, setCompletedChores] = useState([]);
       const [weeklySchedule, setWeeklySchedule] = useState({});
+      const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+      const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+      const [selectedWeek, setSelectedWeek] = useState(null);
       const [adminPin, setAdminPin] = useState("");
       const [userCode, setUserCode] = useState("");
       const [selectedChore, setSelectedChore] = useState(null);
@@ -268,8 +273,10 @@
       const [editingChore, setEditingChore] = useState(null);
       const [editChoreName, setEditChoreName] = useState("");
       const [editChorePay, setEditChorePay] = useState("");
+      const [editChoreWeight, setEditChoreWeight] = useState("light");
       const [newChoreName, setNewChoreName] = useState("");
       const [newChorePay, setNewChorePay] = useState("");
+      const [newChoreWeight, setNewChoreWeight] = useState("light");
       const [editingSchedule, setEditingSchedule] = useState(false);
       const [tempSchedule, setTempSchedule] = useState({});
       const [editingUserCode, setEditingUserCode] = useState(null);
@@ -432,39 +439,123 @@
       };
 
       const assignWeeklySchedule = () => {
+        const year = currentYear;
+        const startMonth = 0; // January
+        const endMonth = 11; // December
         const newSchedule = {};
-        const heavyChores = ["Dishes", "Floors"];
-        const regularChores = chores.filter(c => !heavyChores.includes(c.name));
         
-        DAYS.forEach(day => {
-          const dayAssignments = {};
-          const usersForDay = [...users];
-          const userChoreCount = new Map(usersForDay.map(u => [u.id, 0]));
+        // Go through all months
+        for (let month = startMonth; month <= endMonth; month++) {
+          const { daysInMonth } = getMonthData(year, month);
           
-          usersForDay.sort(() => Math.random() - 0.5);
-          
-          regularChores.forEach((chore, idx) => {
-            const user = usersForDay[idx % usersForDay.length];
-            if (!dayAssignments[user.id]) dayAssignments[user.id] = [];
-            dayAssignments[user.id].push(chore.name);
-            userChoreCount.set(user.id, (userChoreCount.get(user.id) || 0) + 1);
-          });
-          
-          const usersWithOneChore = usersForDay.filter(u => (userChoreCount.get(u.id) || 0) === 1);
-          heavyChores.forEach((choreName, idx) => {
-            if (usersWithOneChore[idx]) {
-              const user = usersWithOneChore[idx];
-              if (!dayAssignments[user.id]) dayAssignments[user.id] = [];
-              dayAssignments[user.id].push(choreName);
+          // Go through each day of the month
+          for (let day = 1; day <= daysInMonth; day++) {
+            const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayAssignments = [];
+            
+            // Get available users who haven't been assigned yet today
+            const availableUsers = [...users];
+            const usersWithHeavyChore = new Set();
+            
+            // Shuffle users for randomness
+            availableUsers.sort(() => Math.random() - 0.5);
+            
+            // Separate chores by weight
+            const heavyChores = chores.filter(c => c.weight === 'heavy');
+            const mediumChores = chores.filter(c => c.weight === 'medium');
+            const lightChores = chores.filter(c => c.weight === 'light');
+            
+            // Shuffle chores
+            const shuffledHeavy = [...heavyChores].sort(() => Math.random() - 0.5);
+            const shuffledMedium = [...mediumChores].sort(() => Math.random() - 0.5);
+            const shuffledLight = [...lightChores].sort(() => Math.random() - 0.5);
+            
+            // Assign chores ensuring everyone gets at least 1 but no more than 2
+            // Heavy chores = only that chore for the day
+            const userChoreCount = new Map(users.map(u => [u.id, 0]));
+            
+            // First pass: give everyone one chore, prioritizing heavy chores
+            let choreIndex = 0;
+            const allChores = [...shuffledHeavy, ...shuffledMedium, ...shuffledLight];
+            
+            for (let i = 0; i < availableUsers.length && choreIndex < allChores.length; i++) {
+              const user = availableUsers[i];
+              const chore = allChores[choreIndex];
+              
+              dayAssignments.push({
+                userId: user.id,
+                userName: user.name,
+                choreName: chore.name,
+                chorePay: chore.pay,
+                choreWeight: chore.weight
+              });
+              
+              userChoreCount.set(user.id, 1);
+              
+              // If this is a heavy chore, mark user as having heavy (can't get more chores)
+              if (chore.weight === 'heavy') {
+                usersWithHeavyChore.add(user.id);
+              }
+              
+              choreIndex++;
             }
-          });
-          
-          newSchedule[day] = dayAssignments;
-        });
+            
+            // Second pass: assign remaining chores (only to users who can take them)
+            while (choreIndex < allChores.length) {
+              const chore = allChores[choreIndex];
+              
+              // Find users who can take this chore
+              const eligibleUsers = availableUsers.filter(u => {
+                const count = userChoreCount.get(u.id) || 0;
+                const hasHeavy = usersWithHeavyChore.has(u.id);
+                
+                // Can't take any more chores if you have a heavy chore
+                if (hasHeavy) return false;
+                
+                // Can't take if already has 2 chores
+                if (count >= 2) return false;
+                
+                return true;
+              });
+              
+              if (eligibleUsers.length === 0) {
+                // If no one can take it, assign to random user anyway
+                const randomUser = availableUsers[Math.floor(Math.random() * availableUsers.length)];
+                dayAssignments.push({
+                  userId: randomUser.id,
+                  userName: randomUser.name,
+                  choreName: chore.name,
+                  chorePay: chore.pay,
+                  choreWeight: chore.weight
+                });
+                choreIndex++;
+              } else {
+                const selectedUser = eligibleUsers[0];
+                dayAssignments.push({
+                  userId: selectedUser.id,
+                  userName: selectedUser.name,
+                  choreName: chore.name,
+                  chorePay: chore.pay,
+                  choreWeight: chore.weight
+                });
+                
+                userChoreCount.set(selectedUser.id, (userChoreCount.get(selectedUser.id) || 0) + 1);
+                
+                if (chore.weight === 'heavy') {
+                  usersWithHeavyChore.add(selectedUser.id);
+                }
+                
+                choreIndex++;
+              }
+            }
+            
+            newSchedule[dateKey] = dayAssignments;
+          }
+        }
         
         setWeeklySchedule(newSchedule);
-        addLoginLog("Admin", "Generated weekly schedule");
-        alert("Weekly schedule generated!");
+        addLoginLog("Admin", "Generated yearly schedule with smart chore distribution");
+        alert("Yearly schedule generated! Heavy chores = 1 chore only per person per day.");
       };
 
       const startEditBalance = (user) => {
@@ -489,6 +580,7 @@
         setEditingChore(chore);
         setEditChoreName(chore.name);
         setEditChorePay(chore.pay.toString());
+        setEditChoreWeight(chore.weight || 'light');
         setScreen("edit-chore");
       };
 
@@ -499,10 +591,11 @@
           alert("Invalid chore data");
           return;
         }
+        
         setChores(c => c.map(ch => ch.id === editingChore.id ? 
-          { ...ch, name: editChoreName, pay: newPay } : ch
+          { ...ch, name: editChoreName, pay: newPay, weight: editChoreWeight } : ch
         ));
-        addLoginLog("Admin", `Updated chore: ${editChoreName}`);
+        addLoginLog("Admin", `Updated chore: ${editChoreName} (${editChoreWeight})`);
         setScreen("admin");
       };
 
@@ -512,11 +605,19 @@
           alert("Invalid chore data");
           return;
         }
-        const newChore = { id: Date.now().toString(), name: newChoreName, pay, status: "available" };
+        
+        const newChore = { 
+          id: Date.now().toString(), 
+          name: newChoreName, 
+          pay, 
+          status: "available", 
+          weight: newChoreWeight 
+        };
         setChores(prev => [...prev, newChore]);
-        addLoginLog("Admin", `Added new chore: ${newChoreName} ($${pay})`);
+        addLoginLog("Admin", `Added new chore: ${newChoreName} ($${pay}) - ${newChoreWeight}`);
         setNewChoreName("");
         setNewChorePay("");
+        setNewChoreWeight("light");
       };
 
       const deleteChore = (choreId) => {
@@ -562,11 +663,12 @@
 
       const addChoreToSchedule = (dateKey, userName, choreName) => {
         const chorePay = chores.find(c => c.name === choreName)?.pay || 0;
+        const choreWeight = chores.find(c => c.name === choreName)?.weight || 'light';
         setTempSchedule(prev => ({
           ...prev,
           [dateKey]: [
             ...(prev[dateKey] || []),
-            { userName, choreName, chorePay, userId: users.find(u => u.name === userName)?.id }
+            { userName, choreName, chorePay, choreWeight, userId: users.find(u => u.name === userName)?.id }
           ]
         }));
       };
@@ -791,7 +893,16 @@
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="text-2xl font-bold text-white mb-1">{chore.name}</h3>
-                          <span className="text-green-400 font-bold text-xl">${chore.pay.toFixed(2)}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-green-400 font-bold text-xl">${chore.pay.toFixed(2)}</span>
+                            <span className={`px-2 py-1 rounded-lg text-xs font-bold ${
+                              chore.weight === 'heavy' ? 'bg-red-500/20 text-red-300' :
+                              chore.weight === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                              'bg-blue-500/20 text-blue-300'
+                            }`}>
+                              {chore.weight?.toUpperCase() || 'LIGHT'}
+                            </span>
+                          </div>
                         </div>
                         <span className={`px-4 py-2 rounded-xl font-semibold text-sm ${
                           chore.status === 'available' ? 'bg-green-500/20 text-green-300' : 'bg-blue-500/20 text-blue-300'
@@ -888,52 +999,165 @@
             {screen === "schedule" && (
               <div className="animate-fade-in-up">
                 <div className="flex justify-between items-center mb-8">
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Monthly Schedule</h1>
-                  <button className="bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 border border-white/10" onClick={() => setScreen("home")}>← Back</button>
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    {selectedWeek === null ? 'Calendar' : 'Week View'}
+                  </h1>
+                  <div className="flex gap-3">
+                    {selectedWeek !== null && (
+                      <button className="bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 border border-white/10" onClick={() => setSelectedWeek(null)}>
+                        ← Back to Calendar
+                      </button>
+                    )}
+                    <button className="bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 border border-white/10" onClick={() => setScreen("home")}>
+                      Home
+                    </button>
+                  </div>
                 </div>
-                
-                <div className="grid grid-cols-1 gap-3">
-                  {Object.entries(weeklySchedule).length === 0 ? (
-                    <div className="glass rounded-2xl p-12 text-center">
-                      <div className="text-6xl mb-4">📅</div>
-                      <p className="text-slate-400 text-xl">No schedule generated yet</p>
-                      <p className="text-slate-500 mt-2">Go to Admin panel to generate a schedule</p>
+
+                {selectedWeek === null ? (
+                  <>
+                    <div className="flex justify-between items-center mb-6">
+                      <button className="btn-primary px-6 py-3 rounded-xl font-bold text-white border-0" onClick={() => {
+                        if (currentMonth === 0) {
+                          setCurrentMonth(11);
+                          setCurrentYear(currentYear - 1);
+                        } else {
+                          setCurrentMonth(currentMonth - 1);
+                        }
+                      }}>
+                        ← Previous
+                      </button>
+                      <h2 className="text-3xl font-bold text-white">
+                        {new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </h2>
+                      <button className="btn-primary px-6 py-3 rounded-xl font-bold text-white border-0" onClick={() => {
+                        if (currentMonth === 11) {
+                          setCurrentMonth(0);
+                          setCurrentYear(currentYear + 1);
+                        } else {
+                          setCurrentMonth(currentMonth + 1);
+                        }
+                      }}>
+                        Next →
+                      </button>
                     </div>
-                  ) : (
-                    Object.entries(weeklySchedule).sort().map(([dateKey, assignments]) => {
-                      const date = new Date(dateKey);
-                      const formatted = formatDate(date);
-                      const isToday = dateKey === new Date().toISOString().split('T')[0];
+
+                    <div className="glass rounded-3xl p-6 mb-6">
+                      <div className="grid grid-cols-7 gap-2 mb-4">
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                          <div key={day} className="text-center font-bold text-purple-300 text-sm">
+                            {day}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-2">
+                        {getWeeksInMonth(currentYear, currentMonth).flat().map((day, idx) => {
+                          if (day === null) {
+                            return <div key={idx} className="aspect-square"></div>;
+                          }
+                          
+                          const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                          const today = new Date();
+                          const isToday = dateKey === `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                          const assignments = weeklySchedule[dateKey] || [];
+                          
+                          return (
+                            <div 
+                              key={idx} 
+                              className={`aspect-square card p-2 rounded-xl cursor-pointer hover:scale-105 transition-transform ${isToday ? 'ring-2 ring-purple-400' : ''}`}
+                              onClick={() => {}}
+                            >
+                              <div className="text-center">
+                                <div className={`font-bold mb-1 ${isToday ? 'text-purple-300' : 'text-white'}`}>{day}</div>
+                                <div className="text-xs text-slate-400">{assignments.length} chores</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="glass rounded-3xl p-6">
+                      <h3 className="text-2xl font-bold text-purple-300 mb-4">Weeks</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {getWeeksInMonth(currentYear, currentMonth).map((week, weekIdx) => {
+                          const validDays = week.filter(d => d !== null);
+                          const firstDay = validDays[0];
+                          const lastDay = validDays[validDays.length - 1];
+                          
+                          return (
+                            <button
+                              key={weekIdx}
+                              className="btn-success p-6 rounded-2xl text-white border-0 hover:scale-105 transition-all duration-300"
+                              onClick={() => setSelectedWeek(weekIdx)}
+                            >
+                              <div className="text-lg font-bold mb-2">Week {weekIdx + 1}</div>
+                              <div className="text-sm opacity-80">
+                                {firstDay && lastDay ? `${firstDay} - ${lastDay}` : 'Partial'}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-4">
+                    {getWeeksInMonth(currentYear, currentMonth)[selectedWeek].map((day, idx) => {
+                      if (day === null) return null;
+                      
+                      const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                      const date = new Date(currentYear, currentMonth, day);
+                      const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
+                      const today = new Date();
+                      const isToday = dateKey === `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                      const assignments = weeklySchedule[dateKey] || [];
                       
                       return (
-                        <div key={dateKey} className={`card p-5 rounded-2xl ${isToday ? 'ring-2 ring-purple-400' : ''}`}>
-                          <div className="flex justify-between items-center mb-3">
+                        <div key={idx} className={`card p-6 rounded-2xl animate-fade-in-up ${isToday ? 'ring-2 ring-purple-400' : ''}`}>
+                          <div className="flex justify-between items-center mb-4">
                             <div>
-                              <h3 className="text-xl font-bold text-purple-300">{formatted.dayName}</h3>
-                              <p className="text-slate-400 text-sm">{formatted.monthDay}</p>
+                              <h3 className="text-2xl font-bold text-purple-300">{dayName}</h3>
+                              <p className="text-slate-400">
+                                {new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'short' })} {day}, {currentYear}
+                              </p>
                             </div>
                             {isToday && (
-                              <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm font-semibold">
+                              <span className="bg-purple-500/20 text-purple-300 px-4 py-2 rounded-full text-sm font-semibold">
                                 Today
                               </span>
                             )}
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                            {assignments.map((assignment, idx) => (
-                              <div key={idx} className="glass-dark p-3 rounded-xl flex justify-between items-center">
-                                <div>
-                                  <span className="font-semibold text-white block">{assignment.userName}</span>
-                                  <span className="text-slate-300 text-sm">{assignment.choreName}</span>
+                          
+                          {assignments.length === 0 ? (
+                            <div className="text-slate-500 text-center py-4">No chores assigned</div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {assignments.map((assignment, aIdx) => (
+                                <div key={aIdx} className="glass-dark p-4 rounded-xl flex justify-between items-center hover:scale-105 transition-transform">
+                                  <div>
+                                    <span className="font-bold text-white block text-lg">{assignment.userName}</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-slate-300">{assignment.choreName}</span>
+                                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                                        assignment.choreWeight === 'heavy' ? 'bg-red-500/20 text-red-300' :
+                                        assignment.choreWeight === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                                        'bg-blue-500/20 text-blue-300'
+                                      }`}>
+                                        {assignment.choreWeight?.toUpperCase() || 'LIGHT'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <span className="text-green-400 font-bold text-lg">${assignment.chorePay.toFixed(2)}</span>
                                 </div>
-                                <span className="text-green-400 font-bold text-sm">${assignment.chorePay.toFixed(2)}</span>
-                              </div>
-                            ))}
-                          </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       );
-                    })
-                  )}
-                </div>
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
@@ -995,13 +1219,37 @@
                     onChange={e => setEditChoreName(e.target.value)} 
                   />
                   <input 
-                    className="w-full p-4 bg-white/5 border-2 border-white/10 rounded-xl text-white text-lg mb-6 placeholder-slate-500 transition-all duration-300" 
+                    className="w-full p-4 bg-white/5 border-2 border-white/10 rounded-xl text-white text-lg mb-4 placeholder-slate-500 transition-all duration-300" 
                     type="number" 
                     step="0.01" 
                     placeholder="Pay" 
                     value={editChorePay} 
                     onChange={e => setEditChorePay(e.target.value)} 
                   />
+                  <div className="mb-6">
+                    <label className="block text-slate-300 mb-2 font-semibold">Chore Weight</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      <button 
+                        className={`py-3 rounded-xl font-bold transition-all ${editChoreWeight === 'light' ? 'bg-blue-500 text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                        onClick={() => setEditChoreWeight('light')}
+                      >
+                        Light
+                      </button>
+                      <button 
+                        className={`py-3 rounded-xl font-bold transition-all ${editChoreWeight === 'medium' ? 'bg-yellow-500 text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                        onClick={() => setEditChoreWeight('medium')}
+                      >
+                        Medium
+                      </button>
+                      <button 
+                        className={`py-3 rounded-xl font-bold transition-all ${editChoreWeight === 'heavy' ? 'bg-red-500 text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                        onClick={() => setEditChoreWeight('heavy')}
+                      >
+                        Heavy
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2">Heavy chores = user gets ONLY that chore for the day</p>
+                  </div>
                   <div className="flex gap-3">
                     <button className="flex-1 btn-success font-bold px-8 py-4 rounded-xl text-white border-0" onClick={saveChore}>Save</button>
                     <button className="bg-white/10 hover:bg-white/20 px-8 py-4 rounded-xl font-semibold transition-all duration-300 border border-white/10" onClick={() => setScreen("admin")}>Cancel</button>
@@ -1016,7 +1264,7 @@
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                   <button className="btn-warning px-8 py-4 rounded-xl font-bold text-xl text-white border-0" onClick={assignWeeklySchedule}>
-                    🎲 Generate Monthly Schedule
+                    🎲 Randomize All Chores
                   </button>
                   <button className="btn-primary px-8 py-4 rounded-xl font-bold text-xl text-white border-0" onClick={startEditSchedule}>
                     ✏️ Edit Schedule
@@ -1078,18 +1326,49 @@
                 <h2 className="text-2xl font-bold text-purple-400 mb-4">📝 Manage Chores</h2>
                 <div className="glass rounded-2xl p-4 mb-4">
                   <h3 className="font-bold mb-3 text-white">Add New Chore</h3>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 mb-3">
                     <input className="flex-1 p-3 bg-white/5 border-2 border-white/10 rounded-lg text-white placeholder-slate-500" placeholder="Chore name" value={newChoreName} onChange={e => setNewChoreName(e.target.value)} />
                     <input className="w-24 p-3 bg-white/5 border-2 border-white/10 rounded-lg text-white placeholder-slate-500" type="number" step="0.01" placeholder="Pay" value={newChorePay} onChange={e => setNewChorePay(e.target.value)} />
-                    <button className="btn-success px-6 py-3 rounded-lg font-bold text-white border-0" onClick={addNewChore}>Add</button>
                   </div>
+                  <div className="flex gap-3 mb-3">
+                    <button 
+                      className={`flex-1 py-2 rounded-lg font-bold transition-all ${newChoreWeight === 'light' ? 'bg-blue-500 text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                      onClick={() => setNewChoreWeight('light')}
+                    >
+                      Light
+                    </button>
+                    <button 
+                      className={`flex-1 py-2 rounded-lg font-bold transition-all ${newChoreWeight === 'medium' ? 'bg-yellow-500 text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                      onClick={() => setNewChoreWeight('medium')}
+                    >
+                      Medium
+                    </button>
+                    <button 
+                      className={`flex-1 py-2 rounded-lg font-bold transition-all ${newChoreWeight === 'heavy' ? 'bg-red-500 text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                      onClick={() => setNewChoreWeight('heavy')}
+                    >
+                      Heavy
+                    </button>
+                  </div>
+                  <button className="btn-success w-full px-6 py-3 rounded-lg font-bold text-white border-0" onClick={addNewChore}>Add Chore</button>
                 </div>
                 <div className="space-y-3 mb-8">
                   {chores.map(ch => (
                     <div key={ch.id} className="card p-4 rounded-xl flex justify-between items-center">
-                      <span className="font-bold text-lg text-white">{ch.name}</span>
+                      <div>
+                        <span className="font-bold text-lg text-white">{ch.name}</span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-green-400 font-bold text-lg">${ch.pay.toFixed(2)}</span>
+                          <span className={`px-2 py-1 rounded text-xs font-bold ${
+                            ch.weight === 'heavy' ? 'bg-red-500/20 text-red-300' :
+                            ch.weight === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                            'bg-blue-500/20 text-blue-300'
+                          }`}>
+                            {ch.weight?.toUpperCase() || 'LIGHT'}
+                          </span>
+                        </div>
+                      </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-green-400 font-bold text-lg">${ch.pay.toFixed(2)}</span>
                         <button className="btn-primary px-4 py-2 rounded-lg font-bold text-white border-0 text-sm" onClick={() => startEditChore(ch)}>Edit</button>
                         <button className="btn-danger px-4 py-2 rounded-lg font-bold text-white border-0 text-sm" onClick={() => deleteChore(ch.id)}>Delete</button>
                       </div>
@@ -1158,14 +1437,15 @@
                 <div className="grid grid-cols-1 gap-3">
                   {Object.entries(tempSchedule).sort().map(([dateKey, assignments]) => {
                     const date = new Date(dateKey);
-                    const formatted = formatDate(date);
+                    const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
+                    const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()];
                     
                     return (
                       <div key={dateKey} className="card p-5 rounded-2xl">
                         <div className="flex justify-between items-center mb-3">
                           <div>
-                            <h3 className="text-xl font-bold text-purple-300">{formatted.dayName}</h3>
-                            <p className="text-slate-400 text-sm">{formatted.monthDay}</p>
+                            <h3 className="text-xl font-bold text-purple-300">{dayName}</h3>
+                            <p className="text-slate-400 text-sm">{monthName} {date.getDate()}</p>
                           </div>
                           <div className="flex gap-2">
                             <select 
