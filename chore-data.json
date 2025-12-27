@@ -24,7 +24,7 @@
     {
       "id": "4",
       "name": "Jason",
-      "balance": 1000000,
+      "balance": 0,
       "code": "9485",
       "exempt": false
     },
@@ -13691,6 +13691,11 @@
   ],
   "loginLogs": [
     {
+      "timestamp": "12/26/2025, 8:11:31 PM",
+      "user": "Admin",
+      "action": "Updated Jason's balance to $0"
+    },
+    {
       "timestamp": "12/26/2025, 8:11:26 PM",
       "user": "Admin",
       "action": "Updated Jason's balance to $1000000"
@@ -14146,5 +14151,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2025-12-27T02:11:27.127Z"
+  "lastUpdated": "2025-12-27T02:11:32.700Z"
 }
