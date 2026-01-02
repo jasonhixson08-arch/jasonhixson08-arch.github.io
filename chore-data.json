@@ -12,7 +12,7 @@
       "name": "Jayden",
       "balance": 3,
       "code": "9999",
-      "exempt": true
+      "exempt": false
     },
     {
       "id": "3",
@@ -13691,6 +13691,11 @@
   ],
   "loginLogs": [
     {
+      "timestamp": "1/2/2026, 1:31:07 AM",
+      "user": "Admin",
+      "action": "Removed exemption for Jayden"
+    },
+    {
       "timestamp": "1/2/2026, 1:31:03 AM",
       "user": "Admin",
       "action": "Logged in"
@@ -14161,5 +14166,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2026-01-02T07:31:04.998Z"
+  "lastUpdated": "2026-01-02T07:31:08.405Z"
 }
