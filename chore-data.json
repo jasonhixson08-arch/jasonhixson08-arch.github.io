@@ -13674,6 +13674,14 @@
   "storedAdminPin": "Hixson",
   "loanRequests": [
     {
+      "id": "1774647500620",
+      "userId": "1",
+      "userName": "Joshua",
+      "amount": 10,
+      "status": "pending",
+      "requestedAt": "3/27/2026, 4:38:20 PM"
+    },
+    {
       "id": "1766480790938",
       "userId": "5",
       "userName": "Mom",
@@ -13702,6 +13710,11 @@
     }
   ],
   "loginLogs": [
+    {
+      "timestamp": "3/27/2026, 4:38:20 PM",
+      "user": "Joshua",
+      "action": "Requested loan of $10.00"
+    },
     {
       "timestamp": "3/27/2026, 4:37:53 PM",
       "user": "Jayden",
@@ -14188,5 +14201,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2026-03-27T21:37:54.626Z"
+  "lastUpdated": "2026-03-27T21:38:23.695Z"
 }
