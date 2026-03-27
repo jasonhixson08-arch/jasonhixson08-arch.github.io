@@ -10,7 +10,7 @@
     {
       "id": "2",
       "name": "Jayden",
-      "balance": 3,
+      "balance": 6,
       "code": "9999",
       "exempt": false
     },
@@ -41,10 +41,8 @@
       "id": "1",
       "name": "Dishes",
       "pay": 3,
-      "status": "in-progress",
-      "weight": "heavy",
-      "assignedTo": "2",
-      "startTime": "4:37 PM"
+      "status": "available",
+      "weight": "heavy"
     },
     {
       "id": "2",
@@ -74,6 +72,18 @@
     }
   ],
   "completedChores": [
+    {
+      "id": "1",
+      "name": "Dishes",
+      "pay": 3,
+      "status": "completed",
+      "weight": "heavy",
+      "assignedTo": "2",
+      "startTime": "4:37 PM",
+      "completedAt": "3/27/2026, 4:37:53 PM",
+      "userName": "Jayden",
+      "finishTime": "4:37 PM"
+    },
     {
       "id": "4",
       "name": "Living Room",
@@ -13693,6 +13703,11 @@
   ],
   "loginLogs": [
     {
+      "timestamp": "3/27/2026, 4:37:53 PM",
+      "user": "Jayden",
+      "action": "Completed chore: Dishes (+$3)"
+    },
+    {
       "timestamp": "3/27/2026, 4:37:51 PM",
       "user": "Jayden",
       "action": "Started chore: Dishes"
@@ -14173,5 +14188,5 @@
       "action": "Started chore: Dishes"
     }
   ],
-  "lastUpdated": "2026-03-27T21:37:52.376Z"
+  "lastUpdated": "2026-03-27T21:37:54.626Z"
 }
